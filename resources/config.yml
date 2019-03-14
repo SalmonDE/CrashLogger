@@ -1,2 +1,3 @@
 validity-duration: 24
 delete-files: true
+report-crash: true

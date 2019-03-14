@@ -58,6 +58,10 @@ class Main extends PluginBase {
 	}
 
 	private function checkNewCrashDump(): void{
+		if($this->getConfig()->get('report-crash', true) !== true){
+			return;
+		}
+
 		$files = $this->getCrashdumpFiles();
 
 		$startTime = (int) \pocketmine\START_TIME;
