@@ -5,7 +5,6 @@ namespace SalmonDE\CrashLogger\Utils;
 
 use RuntimeException;
 use function base64_decode;
-use function empty;
 use function fclose;
 use function fgets;
 use function fopen;
@@ -49,7 +48,7 @@ class CrashDumpReader {
 		}
 		fclose($fileHandle);
 
-		if($start === true and $end === true and !empty($data)){
+		if($start === true and $end === true and trim($data) !== ''){
 			$data = base64_decode($data);
 			$data = zlib_decode($data);
 			$data = json_decode($data, true);
