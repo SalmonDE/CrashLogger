@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace SalmonDE\CrashLogger;
+namespace SalmonDE\CrashLogger\Utils;
 
 use RuntimeException;
 use function base64_decode;
