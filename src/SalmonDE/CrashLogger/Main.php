@@ -62,6 +62,7 @@ class Main extends PluginBase {
 			return;
 		}
 
+		$this->getLogger()->info('Checking if server crashed ...');
 		$files = $this->getCrashdumpFiles();
 
 		$startTime = (int) \pocketmine\START_TIME;
@@ -73,7 +74,9 @@ class Main extends PluginBase {
 					continue;
 				}
 
+				$this->getLogger()->notice('New crash dump found, sending ...');
 				(new DiscordHandler($crashDumpReader))->submit();
+				$this->getLogger()->debug('Crash dump sent');
 			}catch(\Throwable $e){
 				$this->getLogger()->warning('Error while checking potentially new crash dump "'.basename($filePath).'": '.$e->getMessage().' in file '.$e->getFile().' on line '.$e->getLine());
 				foreach(explode("\n", $e->getTraceAsString()) as $traceString){
@@ -81,6 +84,8 @@ class Main extends PluginBase {
 				}
 			}
 		}
+
+		$this->getLogger()->info('Checks finished');
 	}
 
 	public function getCrashdumpFiles(): array{
