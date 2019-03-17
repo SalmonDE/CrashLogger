@@ -29,9 +29,10 @@ class DiscordHandler {
 			return;
 		}
 
-		$webhookData = [];
 		$serverFolder = basename(Server::getInstance()->getDataPath());
+		$this->notifyCrash($serverFolder);
 
+		$webhookData = [];
 		$webhookData['content'] = 'Server "'.$serverFolder.'" crashed 👺';
 
 		$crashData = $this->crashDumpReader->getData();
@@ -104,5 +105,17 @@ class DiscordHandler {
 		}
 
 		return $traceString;
+	}
+
+	final private function notifyCrash(string $serverFolder): void{
+		try{
+			$webhookData = [
+				'content' => 'Crash detected in "'.$serverFolder.'"'
+			];
+
+			Internet::postURL(self::WEBHOOK_URL, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
+		}catch(\Throwable $e){
+			Server::getInstance()->getPluginManager()->getPlugin('CrashLogger')->getLogger()->error('Error during notify in file '.$e->getFile().' on line '.$e->getLine().': '.$e->getMessage());
+		}
 	}
 }
