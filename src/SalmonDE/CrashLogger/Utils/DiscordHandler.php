@@ -46,17 +46,17 @@ class DiscordHandler {
 			'fields' => [
 				[
 					'name' => 'Info',
-					'value' => $infoString,
+					'value' => substr($infoString, 0, 1024),
 					'inline' => true
 				],
 				[
 					'name' => 'Code',
-					'value' => $codeString,
+					'value' => substr($codeString, 0, 1024),
 					'inline' => true
 				],
 				[
 					'name' => 'Trace',
-					'value' => $traceString,
+					'value' => substr($traceString, 0, 1024),
 					'inline' => true
 				]
 			]
@@ -86,7 +86,9 @@ class DiscordHandler {
 			$codeString .= "\n".$codeLine;
 		}
 
-		$codeString .= "\n".'```';
+		$stringEnding = "\n".'```';
+		$codeString = substr($codeString, 0, 1024 - strlen($stringEnding));
+		$codeString .= $stringEnding;
 
 		return $codeString;
 	}
