@@ -75,8 +75,7 @@ class Main extends PluginBase {
 				}
 
 				$this->getLogger()->notice('New crash dump found, sending ...');
-				(new DiscordHandler($crashDumpReader))->submit();
-				$this->getLogger()->debug('Crash dump sent');
+				$this->reportCrashDump($crashDumpReader);
 			}catch(\Throwable $e){
 				$this->getLogger()->warning('Error while checking potentially new crash dump "'.basename($filePath).'": '.$e->getMessage().' in file '.$e->getFile().' on line '.$e->getLine());
 				foreach(explode("\n", $e->getTraceAsString()) as $traceString){
@@ -86,6 +85,13 @@ class Main extends PluginBase {
 		}
 
 		$this->getLogger()->info('Checks finished');
+	}
+
+	private function reportCrashDump(CrashDumpReader $crashDumpReader): void{
+		if($crashDumpReader->hasRead()){
+			(new DiscordHandler($crashDumpReader))->submit();
+			$this->getLogger()->debug('Crash dump sent');
+		}
 	}
 
 	public function getCrashdumpFiles(): array{
