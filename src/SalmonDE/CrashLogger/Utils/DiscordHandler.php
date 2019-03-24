@@ -43,7 +43,7 @@ class DiscordHandler {
 
 		$webhookData['embeds'][] = [
 			'color' => self::COLOURS[array_rand(self::COLOURS)],
-			'title' => $crashData['error']['message'] ?? 'Unknown error',
+			'title' => substr($crashData['error']['message'] ?? 'Unknown error', 0, 256),
 			'fields' => [
 				[
 					'name' => 'Info',
