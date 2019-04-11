@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace SalmonDE\CrashLogger;
 
+use InvalidArgumentException;
 use pocketmine\plugin\PluginBase;
 use SalmonDE\CrashLogger\Utils\CrashDumpReader;
 use SalmonDE\CrashLogger\Utils\DiscordHandler;
