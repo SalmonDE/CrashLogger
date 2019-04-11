@@ -94,7 +94,7 @@ class Main extends PluginBase {
 
 	private function reportCrashDump(CrashDumpReader $crashDumpReader): void{
 		if($crashDumpReader->hasRead()){
-			(new DiscordHandler($this->getConfig()->get('webhook-url'), $crashDumpReader))->submit();
+			(new DiscordHandler($this->getConfig()->get('webhook-url'), $crashDumpReader, $this->getConfig()->get('announce-crash-report', true)))->submit();
 			$this->getLogger()->debug('Crash dump sent');
 		}
 	}

@@ -5,5 +5,7 @@ delete-files: false
 
 # report crash dumps to a discord channel
 report-crash: false
+# announces a crash report. This prevents a crash being overlooked due to the plugin malfunctioning
+announce-crash-report: true
 # webhook url obtained from discord
 webhook-url: ""
