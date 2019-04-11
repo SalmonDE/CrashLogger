@@ -1,6 +1,6 @@
 name: CrashLogger
 main: SalmonDE\CrashLogger\Main
 author: SalmonDE
-version: 1.0.0
 api: [4.0.0]
+version: 1.1.0
 load: STARTUP
