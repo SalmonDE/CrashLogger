@@ -17,10 +17,11 @@ class DiscordHandler {
 		16439902
 	];
 
-	private const WEBHOOK_URL = 'https://discordapp.com/api/webhooks/555805587175374861/EJ6CsXM_vI5yFpBokliLdb_yO4x_ZpAm54zM95Xf95nIgj78pyxU_T8WiYa_strcp962';
+	private $webhookUrl;
 	private $crashDumpReader;
 
-	public function __construct(CrashDumpReader $crashDumpReader){
+	public function __construct(string $webhookUrl, CrashDumpReader $crashDumpReader){
+		$this->webhookUrl = $webhookUrl;
 		$this->crashDumpReader = $crashDumpReader;
 	}
 
@@ -63,7 +64,7 @@ class DiscordHandler {
 			]
 		];
 
-		Internet::postURL(self::WEBHOOK_URL, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
+		Internet::postURL($this->webhookUrl, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
 	}
 
 	protected function getInfoString(array $crashData): string{
@@ -113,7 +114,7 @@ class DiscordHandler {
 				'content' => 'Crash detected in "'.$serverFolder.'"'
 			];
 
-			Internet::postURL(self::WEBHOOK_URL, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
+			Internet::postURL($this->webhookUrl, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
 		}catch(\Throwable $e){
 			Server::getInstance()->getPluginManager()->getPlugin('CrashLogger')->getLogger()->error('Error during notify in file '.$e->getFile().' on line '.$e->getLine().': '.$e->getMessage());
 		}

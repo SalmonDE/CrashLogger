@@ -20,7 +20,7 @@ class Main extends PluginBase {
 
 	private function checkOldCrashDumps(): void{
 		$validityDuration = $this->getConfig()->get('validity-duration', 24) * 60 * 60;
-		$delete = $this->getConfig()->get('delete-files', true);
+		$delete = $this->getConfig()->get('delete-files', false);
 
 		$files = $this->getCrashdumpFiles();
 		$this->getLogger()->info('Checking old crash dumps (files: '.count($files).') ...');
@@ -58,8 +58,12 @@ class Main extends PluginBase {
 	}
 
 	private function checkNewCrashDump(): void{
-		if($this->getConfig()->get('report-crash', true) !== true){
+		if($this->getConfig()->get('report-crash', false) !== true){
 			return;
+		}
+
+		if(trim($this->getConfig()->get('webhook-url', '')) === ''){
+			throw new InvalidArgumentException('Webhook url is invalid');
 		}
 
 		$this->getLogger()->info('Checking if server crashed ...');
@@ -89,7 +93,7 @@ class Main extends PluginBase {
 
 	private function reportCrashDump(CrashDumpReader $crashDumpReader): void{
 		if($crashDumpReader->hasRead()){
-			(new DiscordHandler($crashDumpReader))->submit();
+			(new DiscordHandler($this->getConfig()->get('webhook-url'), $crashDumpReader))->submit();
 			$this->getLogger()->debug('Crash dump sent');
 		}
 	}

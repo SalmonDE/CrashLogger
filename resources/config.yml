@@ -1,3 +1,9 @@
+# how long crash dumps should remain untouched (in hours), only needed if delete-files is true
 validity-duration: 24
-delete-files: true
-report-crash: true
+# auto delete old crash dumps
+delete-files: false
+
+# report crash dumps to a discord channel
+report-crash: false
+# webhook url obtained from discord
+webhook-url: ""
