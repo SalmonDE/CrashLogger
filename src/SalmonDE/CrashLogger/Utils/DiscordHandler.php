@@ -21,12 +21,14 @@ class DiscordHandler {
 	private $crashDumpReader;
 
 	private $announceCrash = true;
+	private $fullPath = false;
 
-	public function __construct(string $webhookUrl, CrashDumpReader $crashDumpReader, bool $announceCrash = true){
+	public function __construct(string $webhookUrl, CrashDumpReader $crashDumpReader, bool $announceCrash = true, bool $fullPath = false){
 		$this->webhookUrl = $webhookUrl;
 		$this->crashDumpReader = $crashDumpReader;
 
 		$this->announceCrash = $announceCrash;
+		$this->fullPath = $fullPath;
 	}
 
 	public function submit(): void{
@@ -34,7 +36,7 @@ class DiscordHandler {
 			return;
 		}
 
-		$serverFolder = basename(Server::getInstance()->getDataPath());
+		$serverFolder = $this->fullPath ? Server::getInstance()->getDataPath() : basename(Server::getInstance()->getDataPath());
 		if($this->announceCrash){
 			$this->announceCrash($serverFolder);
 		}
