@@ -10,12 +10,12 @@ use SalmonDE\CrashLogger\Utils\DiscordHandler;
 
 class Main extends PluginBase {
 
-	public function onEnable(): void{
+	protected function onEnable(): void{
 		$this->saveResource('config.yml');
 		$this->checkOldCrashDumps();
 	}
 
-	public function onDisable(): void{
+	protected function onDisable(): void{
 		$this->checkNewCrashDump();
 	}
 
