@@ -104,6 +104,7 @@ class DiscordHandler {
 	}
 
 	protected function getTraceString(array $crashData): string{
+		$traceString = '';
 		foreach($crashData['trace'] as $trace){
 			if(!isset($traceString)){
 				$traceString = $trace;
