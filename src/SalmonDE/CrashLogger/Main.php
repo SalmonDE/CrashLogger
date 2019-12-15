@@ -70,7 +70,7 @@ class Main extends PluginBase {
 		$this->getLogger()->info('Checking if server crashed ...');
 		$files = $this->getCrashdumpFiles();
 
-		$startTime = (int) \pocketmine\START_TIME;
+		$startTime = (int) $this->getServer()->getStartTime();
 		foreach($files as $filePath){
 			try{
 				$crashDumpReader = new CrashDumpReader($filePath);
