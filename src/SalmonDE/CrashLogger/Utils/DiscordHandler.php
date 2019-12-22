@@ -72,7 +72,7 @@ class DiscordHandler {
 			]
 		];
 
-		Internet::postURL($this->webhookUrl, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
+		Internet::postURL($this->webhookUrl, $webhookData, 10, ['Content-Type' => 'application/json']);
 	}
 
 	protected function getInfoString(array $crashData): string{
@@ -123,7 +123,7 @@ class DiscordHandler {
 				'content' => 'Crash detected in "'.$serverFolder.'"'
 			];
 
-			Internet::postURL($this->webhookUrl, json_encode($webhookData), 10, ['Content-Type' => 'application/json']);
+			Internet::postURL($this->webhookUrl, $webhookData, 10, ['Content-Type' => 'application/json']);
 		}catch(\Throwable $e){
 			Server::getInstance()->getPluginManager()->getPlugin('CrashLogger')->getLogger()->error('Error during crash announcement in file '.$e->getFile().' on line '.$e->getLine().': '.$e->getMessage());
 		}
