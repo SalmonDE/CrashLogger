@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace salmonde\crashlogger\utils;
 
-use pocketmine\CrashDump;
 use pocketmine\Server;
 use pocketmine\utils\Internet;
 
