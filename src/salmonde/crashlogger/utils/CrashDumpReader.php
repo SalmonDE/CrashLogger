@@ -23,7 +23,7 @@ class CrashDumpReader {
 		$this->readData();
 	}
 
-	final private function readData(): void{
+	private function readData(): void{
 		$fileHandle = fopen($this->filePath, "r");
 
 		$start = false;
