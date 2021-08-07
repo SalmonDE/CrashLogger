@@ -44,13 +44,11 @@ class DiscordHandler {
 		];
 
 		$webhookData = [
-			"payload_json" => json_encode($payload_json),
-			"file" => trim(file_get_contents($this->crashDumpReader->getFilePath()))
+			"payload_json" => json_encode($payload_json)
 		];
 
 		$result = Internet::postURL($this->webhookUrl, $webhookData, 10, [
-			"Content-Type" => "multipart/form-data",
-			"Content-Disposition" => "form-data; name:\"file\"; filename=\"".$this->crashDumpReader->getFileName()."\""
+			"Content-Type" => "multipart/form-data"
 		]);
 
 		if($result->getCode() !== 204){
