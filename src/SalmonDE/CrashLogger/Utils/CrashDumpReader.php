@@ -24,31 +24,31 @@ class CrashDumpReader {
 	}
 
 	final private function readData(): void{
-		$fileHandle = fopen($this->filePath, 'r');
+		$fileHandle = fopen($this->filePath, "r");
 
 		$start = false;
 		$end = false;
 
-		$data = '';
+		$data = "";
 		while($line = fgets($fileHandle)){
 			$line = trim($line);
 
 			if($start === true){
 				if($end === false){
-					if($line === '===END CRASH DUMP==='){
+					if($line === "===END CRASH DUMP==="){
 						$end = true;
 						break;
 					}else{
 						$data .= $line;
 					}
 				}
-			}elseif($line === '===BEGIN CRASH DUMP==='){
+			}elseif($line === "===BEGIN CRASH DUMP==="){
 				$start = true;
 			}
 		}
 		fclose($fileHandle);
 
-		if($start === true and $end === true and trim($data) !== ''){
+		if($start === true and $end === true and trim($data) !== ""){
 			$data = base64_decode($data);
 			$data = zlib_decode($data);
 			$data = json_decode($data, true);
@@ -70,9 +70,9 @@ class CrashDumpReader {
 
 	public function getCreationTime(): int{
 		if(!$this->hasRead()){
-			throw new RuntimeException('No data was read');
+			throw new RuntimeException("No data was read");
 		}
 
-		return $this->data['time'];
+		return $this->data["time"];
 	}
 }

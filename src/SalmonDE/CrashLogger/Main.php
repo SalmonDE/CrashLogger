@@ -11,7 +11,7 @@ use SalmonDE\CrashLogger\Utils\DiscordHandler;
 class Main extends PluginBase {
 
 	protected function onEnable(): void{
-		$this->saveResource('config.yml');
+		$this->saveResource("config.yml");
 		$this->checkOldCrashDumps();
 	}
 
@@ -20,11 +20,11 @@ class Main extends PluginBase {
 	}
 
 	private function checkOldCrashDumps(): void{
-		$validityDuration = $this->getConfig()->get('validity-duration', 24) * 60 * 60;
-		$delete = $this->getConfig()->get('delete-files', false);
+		$validityDuration = $this->getConfig()->get("validity-duration", 24) * 60 * 60;
+		$delete = $this->getConfig()->get("delete-files", false);
 
 		$files = $this->getCrashdumpFiles();
-		$this->getLogger()->info('Checking old crash dumps (files: '.count($files).') ...');
+		$this->getLogger()->info("Checking old crash dumps (files: ".count($files).")");
 
 		$removed = 0;
 		foreach($files as $filePath){
@@ -40,17 +40,17 @@ class Main extends PluginBase {
 					++$removed;
 				}
 			}catch(\Throwable $e){
-				$this->getLogger()->warning('Error during file check of "'.basename($filePath).'": '.$e->getMessage().' in file '.$e->getFile().' on line '.$e->getLine());
+				$this->getLogger()->warning("Error during file check of "".basename($filePath)."": ".$e->getMessage()." in file ".$e->getFile()." on line ".$e->getLine());
 				foreach(explode("\n", $e->getTraceAsString()) as $traceString){
-					$this->getLogger()->debug('[ERROR] '.$traceString);
+					$this->getLogger()->debug("[ERROR] ".$traceString);
 				}
 			}
 		}
 
 		$fileAmount = count($files);
-		$percentage = $fileAmount > 0 ? round($removed * 100 / $fileAmount, 2) : 'NAN';
+		$percentage = $fileAmount > 0 ? round($removed * 100 / $fileAmount, 2) : "NAN";
 
-		$message = 'Checks finished, Deleted files: '.$removed.' ('.$percentage.'%)';
+		$message = "Checks finished, Deleted crashdump files: ".$removed." (".$percentage."%)";
 		if($removed > 0){
 			$this->getLogger()->notice($message);
 		}else{
@@ -59,15 +59,15 @@ class Main extends PluginBase {
 	}
 
 	private function checkNewCrashDump(): void{
-		if($this->getConfig()->get('report-crash', false) !== true){
+		if($this->getConfig()->get("report-crash", false) !== true){
 			return;
 		}
 
-		if(trim($this->getConfig()->get('webhook-url', '')) === ''){
-			throw new InvalidArgumentException('Webhook url is invalid');
+		if(trim($this->getConfig()->get("webhook-url", "")) === ""){
+			throw new InvalidArgumentException("Webhook url is invalid");
 		}
 
-		$this->getLogger()->info('Checking if server crashed ...');
+		$this->getLogger()->debug("Checking for new crashdump");
 		$files = $this->getCrashdumpFiles();
 
 		$startTime = (int) $this->getServer()->getStartTime();
@@ -79,27 +79,27 @@ class Main extends PluginBase {
 					continue;
 				}
 
-				$this->getLogger()->notice('New crash dump found, sending ...');
+				$this->getLogger()->notice("New crash dump found. Sending now.");
 				$this->reportCrashDump($crashDumpReader);
 			}catch(\Throwable $e){
-				$this->getLogger()->warning('Error while checking potentially new crash dump "'.basename($filePath).'": '.$e->getMessage().' in file '.$e->getFile().' on line '.$e->getLine());
+				$this->getLogger()->warning("Error while checking potentially new crash dump \"".basename($filePath)."\": ".$e->getMessage()." in file ".$e->getFile()." on line ".$e->getLine());
 				foreach(explode("\n", $e->getTraceAsString()) as $traceString){
-					$this->getLogger()->debug('[ERROR] '.$traceString);
+					$this->getLogger()->debug("[ERROR] ".$traceString);
 				}
 			}
 		}
 
-		$this->getLogger()->info('Checks finished');
+		$this->getLogger()->debug("Checks finished");
 	}
 
 	private function reportCrashDump(CrashDumpReader $crashDumpReader): void{
 		if($crashDumpReader->hasRead()){
-			(new DiscordHandler($this->getConfig()->get('webhook-url'), $crashDumpReader, $this->getConfig()->get('announce-crash-report', true), $this->getConfig()->get('announce-full-path', false)))->submit();
-			$this->getLogger()->debug('Crash dump sent');
+			(new DiscordHandler($this->getConfig()->get("webhook-url"), $crashDumpReader, $this->getConfig()->get("announce-crash-report", true), $this->getConfig()->get("announce-full-path", false)))->submit();
+			$this->getLogger()->debug("Crash dump sent");
 		}
 	}
 
 	public function getCrashdumpFiles(): array{
-		return glob($this->getServer()->getDataPath().'crashdumps/*.log');
+		return glob($this->getServer()->getDataPath()."crashdumps/*.log");
 	}
 }

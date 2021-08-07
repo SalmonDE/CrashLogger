@@ -42,7 +42,7 @@ class DiscordHandler {
 		}
 
 		$webhookData = [];
-		$webhookData['content'] = 'Server "'.$serverFolder.'" crashed 👺';
+		$webhookData["content"] = "Server \"".$serverFolder."\" crashed 👺";
 
 		$crashData = $this->crashDumpReader->getData();
 
@@ -50,53 +50,53 @@ class DiscordHandler {
 		$codeString = $this->getCodeString($crashData);
 		$traceString = $this->getTraceString($crashData);
 
-		$webhookData['embeds'][] = [
-			'color' => self::COLOURS[array_rand(self::COLOURS)],
-			'title' => substr($crashData['error']['message'] ?? 'Unknown error', 0, 256),
-			'fields' => [
+		$webhookData["embeds"][] = [
+			"color" => self::COLOURS[array_rand(self::COLOURS)],
+			"title" => substr($crashData["error"]["message"] ?? "Unknown error", 0, 256),
+			"fields" => [
 				[
-					'name' => 'Info',
-					'value' => substr($infoString, 0, 1024),
-					'inline' => true
+					"name" => "Info",
+					"value" => substr($infoString, 0, 1024),
+					"inline" => true
 				],
 				[
-					'name' => 'Code',
-					'value' => substr($codeString, 0, 1024),
-					'inline' => true
+					"name" => "Code",
+					"value" => substr($codeString, 0, 1024),
+					"inline" => true
 				],
 				[
-					'name' => 'Trace',
-					'value' => substr($traceString, 0, 1024),
-					'inline' => true
+					"name" => "Trace",
+					"value" => substr($traceString, 0, 1024),
+					"inline" => true
 				]
 			]
 		];
 
-		Internet::postURL($this->webhookUrl, $webhookData, 10, ['Content-Type' => 'application/json']);
+		Internet::postURL($this->webhookUrl, $webhookData, 10, ["Content-Type" => "application/json"]);
 	}
 
 	protected function getInfoString(array $crashData): string{
-		$infoString  =      'File: **'.$crashData['error']['file'].'**';
-		$infoString .= "\n".'Line: **'.$crashData['error']['line'].'**';
-		$infoString .= "\n".'Type: '.$crashData['error']['type'];
-		$infoString .= "\n".'Time: '.date('d.m.Y (l): H:i:s [e]');
-		$infoString .= "\n".'Plugin involved: '.$crashData['plugin_involvement'];
-		$infoString .= "\n".'Plugin: **'.($crashData['plugin'] ?? '?').'**';
-		$infoString .= "\n".'Git commit: __'.$crashData['general']['git'].'__';
+		$infoString  = "File: **".$crashData["error"]["file"]."**";
+		$infoString .= "\nLine: **".$crashData["error"]["line"]."**";
+		$infoString .= "\nType: ".$crashData["error"]["type"];
+		$infoString .= "\nTime: ".date("d.m.Y (l): H:i:s [e]");
+		$infoString .= "\nPlugin involved: ".$crashData["plugin_involvement"];
+		$infoString .= "\nPlugin: **".($crashData["plugin"] ?? "?")."**";
+		$infoString .= "\nGit commit: __".$crashData["general"]["git"]."__";
 
 		return $infoString;
 	}
 
 	protected function getCodeString(array $crashData): string{
-		$codeString = '```php';
+		$codeString = "```php";
 
-		$faultyLine = $crashData['error']['line'];
-		foreach($crashData['code'] as $line => $code){
-			$codeLine = ($line === $faultyLine ? '>' : ' ').'['.$line.'] '.$code;
+		$faultyLine = $crashData["error"]["line"];
+		foreach($crashData["code"] as $line => $code){
+			$codeLine = ($line === $faultyLine ? ">" : " ")."[".$line."] ".$code;
 			$codeString .= "\n".$codeLine;
 		}
 
-		$stringEnding = "\n".'```';
+		$stringEnding = "\n```";
 		$codeString = substr($codeString, 0, 1024 - strlen($stringEnding));
 		$codeString .= $stringEnding;
 
@@ -104,8 +104,8 @@ class DiscordHandler {
 	}
 
 	protected function getTraceString(array $crashData): string{
-		$traceString = '';
-		foreach($crashData['trace'] as $trace){
+		$traceString = "";
+		foreach($crashData["trace"] as $trace){
 			if(!isset($traceString)){
 				$traceString = $trace;
 				continue;
@@ -120,12 +120,12 @@ class DiscordHandler {
 	final private function announceCrash(string $serverFolder): void{
 		try{
 			$webhookData = [
-				'content' => 'Crash detected in "'.$serverFolder.'"'
+				"content" => "Crash detected in \"".$serverFolder."\""
 			];
 
-			Internet::postURL($this->webhookUrl, $webhookData, 10, ['Content-Type' => 'application/json']);
+			Internet::postURL($this->webhookUrl, $webhookData, 10, ["Content-Type" => "application/json"]);
 		}catch(\Throwable $e){
-			Server::getInstance()->getPluginManager()->getPlugin('CrashLogger')->getLogger()->error('Error during crash announcement in file '.$e->getFile().' on line '.$e->getLine().': '.$e->getMessage());
+			Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getLogger()->error("Error during crash announcement in file ".$e->getFile()." on line ".$e->getLine().": ".$e->getMessage());
 		}
 	}
 }
