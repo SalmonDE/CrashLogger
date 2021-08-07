@@ -52,8 +52,6 @@ class DiscordHandler {
 			"Content-Type" => "multipart/form-data",
 			"Content-Disposition" => "form-data; name:\"file\"; filename=\"".$this->crashDumpReader->getFileName()."\""
 		]);
-
-		var_dump($result);
 	}
 
 	private function announceCrash(string $serverFolder): void{

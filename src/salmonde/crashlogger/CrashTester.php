@@ -15,7 +15,6 @@ class CrashTester implements CommandExecutor {
 
 	public function __construct(){
 		$this->code = random_int(1000, 9999);
-		new TestException();
 	}
 
 	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args): bool{
