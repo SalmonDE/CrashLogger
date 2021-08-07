@@ -6,7 +6,7 @@ validity-duration: 24
 # report crash dumps to a discord channel
 report-crash: false
 # announces a crash report. This prevents a crash being overlooked due to the plugin malfunctioning
-announce-crash-report: true
+announce-crash-report: false
 # This plugin assumes that the server folder name is an informative description of the server.
 # If this isn't the case, you can enable the usage of the full server path to ensure an unambiguous crash report.
 announce-full-path: false
