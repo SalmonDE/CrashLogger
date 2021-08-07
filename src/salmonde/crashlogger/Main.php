@@ -13,6 +13,8 @@ class Main extends PluginBase {
 	protected function onEnable(): void{
 		$this->saveResource("config.yml");
 		$this->checkOldCrashDumps();
+
+		$this->getServer()->getCommandMap()->getCommand("crashloggertest")->setExecutor(new CrashTester());
 	}
 
 	protected function onDisable(): void{
@@ -40,7 +42,7 @@ class Main extends PluginBase {
 					++$removed;
 				}
 			}catch(\Throwable $e){
-				$this->getLogger()->warning("Error during file check of "".basename($filePath)."": ".$e->getMessage()." in file ".$e->getFile()." on line ".$e->getLine());
+				$this->getLogger()->warning("Error during file check of \"".basename($filePath)."\": ".$e->getMessage()." in file ".$e->getFile()." on line ".$e->getLine());
 				foreach(explode("\n", $e->getTraceAsString()) as $traceString){
 					$this->getLogger()->debug("[ERROR] ".$traceString);
 				}

@@ -4,3 +4,11 @@ author: SalmonDE
 api: [4.0.0]
 version: 1.1.0
 load: STARTUP
+commands:
+    crashloggertest:
+        usage: "/crashloggertest <code>"
+        permission: "crashloggertest"
+        description: "Crashes the server deliberately to test the CrashLogger functionality"
+permissions:
+    crashloggertest:
+        default: op
