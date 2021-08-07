@@ -16,18 +16,16 @@ class DiscordHandler {
 		16439902
 	];
 
-	private $webhookUrl;
-	private $crashDumpReader;
+	private string $webhookUrl;
+	private CrashDumpReader $crashDumpReader;
 
-	private $announceCrash = true;
-	private $fullPath = false;
+	public bool $announceCrash = true;
+	public bool $fullPath = false;
+	public string $dateFormat = "d.m.Y (l): H:i:s [e]";
 
-	public function __construct(string $webhookUrl, CrashDumpReader $crashDumpReader, bool $announceCrash = true, bool $fullPath = false){
+	public function __construct(string $webhookUrl, CrashDumpReader $crashDumpReader){
 		$this->webhookUrl = $webhookUrl;
 		$this->crashDumpReader = $crashDumpReader;
-
-		$this->announceCrash = $announceCrash;
-		$this->fullPath = $fullPath;
 	}
 
 	public function submit(): void{
@@ -40,83 +38,25 @@ class DiscordHandler {
 			$this->announceCrash($serverFolder);
 		}
 
-		$webhookData = [];
-		$webhookData["content"] = "Server \"".$serverFolder."\" crashed 👺";
-
-		$crashData = $this->crashDumpReader->getData();
-
-		$infoString = $this->getInfoString($crashData);
-		$codeString = $this->getCodeString($crashData);
-		$traceString = $this->getTraceString($crashData);
-
-		$webhookData["embeds"][] = [
-			"color" => self::COLOURS[array_rand(self::COLOURS)],
-			"title" => substr($crashData["error"]["message"] ?? "Unknown error", 0, 256),
-			"fields" => [
-				[
-					"name" => "Info",
-					"value" => substr($infoString, 0, 1024),
-					"inline" => true
-				],
-				[
-					"name" => "Code",
-					"value" => substr($codeString, 0, 1024),
-					"inline" => true
-				],
-				[
-					"name" => "Trace",
-					"value" => substr($traceString, 0, 1024),
-					"inline" => true
-				]
-			]
+		$payload_json = [
+			"content" => "Server \"".$serverFolder."\" crashed 👺",
+			"embeds" => [$this->getEmbedData()]
 		];
 
-		Internet::postURL($this->webhookUrl, $webhookData, 10, ["Content-Type" => "application/json"]);
+		$webhookData = [
+			"payload_json" => json_encode($payload_json),
+			"file" => trim(file_get_contents($this->crashDumpReader->getFilePath()))
+		];
+
+		$result = Internet::postURL($this->webhookUrl, $webhookData, 10, [
+			"Content-Type" => "multipart/form-data",
+			"Content-Disposition" => "form-data; name:\"file\"; filename=\"".$this->crashDumpReader->getFileName()."\""
+		]);
+
+		var_dump($result);
 	}
 
-	protected function getInfoString(array $crashData): string{
-		$infoString  = "File: **".$crashData["error"]["file"]."**";
-		$infoString .= "\nLine: **".$crashData["error"]["line"]."**";
-		$infoString .= "\nType: ".$crashData["error"]["type"];
-		$infoString .= "\nTime: ".date("d.m.Y (l): H:i:s [e]");
-		$infoString .= "\nPlugin involved: ".$crashData["plugin_involvement"];
-		$infoString .= "\nPlugin: **".($crashData["plugin"] ?? "?")."**";
-		$infoString .= "\nGit commit: __".$crashData["general"]["git"]."__";
-
-		return $infoString;
-	}
-
-	protected function getCodeString(array $crashData): string{
-		$codeString = "```php";
-
-		$faultyLine = $crashData["error"]["line"];
-		foreach($crashData["code"] as $line => $code){
-			$codeLine = ($line === $faultyLine ? ">" : " ")."[".$line."] ".$code;
-			$codeString .= "\n".$codeLine;
-		}
-
-		$stringEnding = "\n```";
-		$codeString = substr($codeString, 0, 1024 - strlen($stringEnding));
-		$codeString .= $stringEnding;
-
-		return $codeString;
-	}
-
-	protected function getTraceString(array $crashData): string{
-		$traceString = "";
-		foreach($crashData["trace"] as $trace){
-			if(!isset($traceString)){
-				$traceString = $trace;
-				continue;
-			}
-
-			$traceString .= "\n".$trace;
-		}
-
-		return $traceString;
-	}
-
-	final private function announceCrash(string $serverFolder): void{
+	private function announceCrash(string $serverFolder): void{
 		try{
 			$webhookData = [
 				"content" => "Crash detected in \"".$serverFolder."\""
@@ -126,5 +66,58 @@ class DiscordHandler {
 		}catch(\Throwable $e){
 			Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getLogger()->error("Error during crash announcement in file ".$e->getFile()." on line ".$e->getLine().": ".$e->getMessage());
 		}
+	}
+
+	private function getEmbedData(): array{
+		$crashData = $this->crashDumpReader->getData();
+
+		if($crashData["uptime"] < 60){
+			$uptime = round($crashData["uptime"], 2)." seconds";
+		}elseif($crashData["uptime"] < 60 ** 2){
+			$uptime = round($crashData["uptime"] / 60)." minutes";
+		}elseif($crashData["uptime"] < 24 * 60 ** 2){
+			$uptime = round($crashData["uptime"] / 3600)." hours";
+		}else{
+			$uptime = round($crashData["uptime"] / (24 * 60 ** 2))." days";
+		}
+
+		$faultyLine = $crashData["error"]["line"];
+		$codeData = $crashData["code"];
+		foreach($codeData as $line => $code){
+			$codeData[$line] = ($line === $faultyLine ? ">" : " ")."[".$line."] ".$code;
+		}
+		$codeString = "```php\n";
+		$stringEnding = "\n```";
+		$codeString .= substr(implode("\n", $codeData), 0, 1024 - strlen($codeString.$stringEnding)).$stringEnding;
+
+		$data = [
+			"Exception Class" => $crashData["error"]["type"],
+			"File" => "**".$crashData["error"]["file"]."**",
+			"Line" => "**".$faultyLine."**",
+			"Plugin involved" => $crashData["plugin_involvement"],
+			"Plugin" => "**".($crashData["plugin"] ?? "?")."**",
+			"Code" => $codeString,
+			"Trace" => "```\n".substr(implode("\n", $crashData["trace"]), 0, 1024 - strlen("```\n".$stringEnding))."\n```",
+			"Server Time" => date($this->dateFormat, (int) $crashData["time"]),
+			"Server Uptime" => $uptime,
+			"Server Git Commit" => "__".$crashData["general"]["git"]."__"
+		];
+
+		$fields = [];
+		foreach($data as $fieldName => $fieldValue){
+			$fields[] = [
+				"name" => $fieldName,
+				"value" => $fieldValue
+			];
+		}
+
+		return [
+			"color" => self::COLOURS[array_rand(self::COLOURS)],
+			"title" => "Error: ".(substr($this->crashDumpReader->getData()["error"]["message"] ?? "Unknown error", 0, 256)),
+			"fields" => $fields,
+			"footer" => [
+				"text" => "Sent by CrashLogger v".Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getDescription()->getVersion()
+			]
+		];
 	}
 }

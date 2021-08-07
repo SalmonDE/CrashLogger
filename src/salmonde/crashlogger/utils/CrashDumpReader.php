@@ -15,8 +15,8 @@ use function zlib_decode;
 
 class CrashDumpReader {
 
-	private $filePath;
-	private $data = null;
+	private string $filePath;
+	private ?array $data = null;
 
 	public function __construct(string $filePath){
 		$this->filePath = $filePath;
@@ -64,15 +64,19 @@ class CrashDumpReader {
 		return $this->filePath;
 	}
 
+	public function getFileName(): string{
+		return basename($this->getFilePath());
+	}
+
 	public function getData(): ?array{
 		return $this->data;
 	}
 
-	public function getCreationTime(): int{
+	public function getCreationTime(): float{
 		if(!$this->hasRead()){
 			throw new RuntimeException("No data was read");
 		}
 
-		return $this->data["time"];
+		return (float) $this->data["time"];
 	}
 }
