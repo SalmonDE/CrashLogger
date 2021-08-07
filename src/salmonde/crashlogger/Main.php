@@ -50,7 +50,7 @@ class Main extends PluginBase {
 		$fileAmount = count($files);
 		$percentage = $fileAmount > 0 ? round($removed * 100 / $fileAmount, 2) : "NAN";
 
-		$message = "Checks finished, Deleted crashdump files: ".$removed." (".$percentage."%)";
+		$message = "Checks finished, Deleted crash dump files: ".$removed." (".$percentage."%)";
 		if($removed > 0){
 			$this->getLogger()->notice($message);
 		}else{
@@ -67,7 +67,7 @@ class Main extends PluginBase {
 			throw new InvalidArgumentException("Webhook url is invalid");
 		}
 
-		$this->getLogger()->debug("Checking for new crashdump");
+		$this->getLogger()->debug("Checking for new crash dump");
 		$files = $this->getCrashdumpFiles();
 
 		$startTime = (int) $this->getServer()->getStartTime();
