@@ -102,7 +102,8 @@ class DiscordHandler {
 			"Trace" => "```\n".substr(implode("\n", $crashData["trace"]), 0, 1024 - strlen("```\n".$stringEnding))."\n```",
 			"Server Time" => date($this->dateFormat, (int) $crashData["time"]),
 			"Server Uptime" => $uptime,
-			"Server Git Commit" => "__".$crashData["general"]["git"]."__"
+			"Server Git Commit" => "__".$crashData["general"]["git"]."__",
+			"PHP Version" => phpversion().((function_exists('opcache_get_status') && ($opcacheStatus = opcache_get_status(false)) !== false && ($opcacheStatus["jit"]["on"] ?? false)) ? " (JIT enabled)" : " (JIT disabled)")
 		];
 
 		$fields = [];
