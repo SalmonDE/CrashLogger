@@ -52,6 +52,10 @@ class DiscordHandler {
 			"Content-Type" => "multipart/form-data",
 			"Content-Disposition" => "form-data; name:\"file\"; filename=\"".$this->crashDumpReader->getFileName()."\""
 		]);
+
+		if($result->getCode() !== 204){
+			Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getLogger()->warning("Crash dump possibly not sent; Discord webhook api returned an unexpected http status code: ".$result->getCode());
+		}
 	}
 
 	private function announceCrash(string $serverFolder): void{
