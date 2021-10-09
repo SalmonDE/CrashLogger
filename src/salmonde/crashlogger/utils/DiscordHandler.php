@@ -114,7 +114,7 @@ class DiscordHandler {
 
 		return [
 			"color" => self::COLOURS[array_rand(self::COLOURS)],
-			"title" => "Error: ".(substr($this->crashDumpReader->getData()["error"]["message"] ?? "Unknown error", 0, 256)),
+			"title" => "Error: ".(substr($this->crashDumpReader->getData()["error"]["message"] ?? "Unknown error", 0, 128)),
 			"fields" => $fields,
 			"footer" => [
 				"text" => "Sent by CrashLogger v".Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getDescription()->getVersion()
