@@ -52,7 +52,8 @@ class DiscordHandler {
 		]);
 
 		if($result->getCode() !== 204){
-			Server::getInstance()->getPluginManager()->getPlugin("CrashLogger")->getLogger()->warning("Crash dump possibly not sent; Discord webhook api returned an unexpected http status code: ".$result->getCode());
+			$plugin = Server::getInstance()->getPluginManager()->getPlugin("CrashLogger");
+			$plugin->getLogger()->warning("Crash dump possibly not sent; Discord webhook api returned an unexpected http status code: ".$result->getCode()."\nPayload: ".$webhookData["payload_json"]."\n"."\nBody:\n".$result->getBody());
 		}
 	}
 
