@@ -92,6 +92,7 @@ class DiscordHandler {
 
 		$data = [
 			"Exception Class" => $crashData["error"]["type"],
+			"Error" => substr($this->crashDumpReader->getData()["error"]["message"] ?? "Unknown error", 0, 256),
 			"File" => "**".$crashData["error"]["file"]."**",
 			"Line" => "**".$faultyLine."**",
 			"Plugin involved" => $crashData["plugin_involvement"],
